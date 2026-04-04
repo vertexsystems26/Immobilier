@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUXE IMMOBILIER — Propriétés d'Exception</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================
+     CSS VARIABLES & RESET
+  ============================ */
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --dark: #0D0D0D;
+    --dark-2: #141414;
+    --dark-3: #1C1C1C;
+    --dark-4: #242424;
+    --text: #F5F0E8;
+    --text-muted: #9A9080;
+    --text-dim: #5A5248;
+    --white: #FFFFFF;
+    --transition: cubic-bezier(0.77, 0, 0.175, 1);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ============================
+     CUSTOM CURSOR
+  ============================ */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: all 0.18s var(--ease-out);
+  }
+  body:has(a:hover) .cursor-ring,
+  body:has(button:hover) .cursor-ring {
+    width: 56px; height: 56px;
+    border-color: var(--gold);
+  }
+
+  /* ============================
+     LOADER
+  ============================ */
+  #loader {
+    position: fixed; inset: 0;
+    background: var(--dark);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s var(--transition), visibility 0.8s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+
+  .loader-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3.5rem;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--text);
+    overflow: hidden;
+  }
+  .loader-logo span {
+    display: inline-block;
+    animation: slideUp 1s var(--ease-out) both;
+  }
+  .loader-logo span:nth-child(1) { animation-delay: 0.1s; }
+  .loader-logo span:nth-child(2) { animation-delay: 0.2s; }
+  .loader-logo span:nth-child(3) { animation-delay: 0.3s; }
+  .loader-logo span:nth-child(4) { animation-delay: 0.4s; }
+
+  .loader-line {
+    width: 0; height: 1px;
+    background: var(--gold);
+    margin-top: 1.5rem;
+    animation: expandLine 1.5s var(--ease-out) 0.5s both;
+  }
+  .loader-sub {
+    font-size: 0.65rem;
+    letter-spacing: 0.4em;
+    color: var(--gold);
+    margin-top: 0.8rem;
+    opacity: 0;
+    animation: fadeIn 0.6s ease 1.2s both;
+    text-transform: uppercase;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes expandLine {
+    from { width: 0; }
+    to { width: 180px; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ============================
+     NAVBAR
+  ============================ */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 1.8rem 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.5s var(--ease-out);
+  }
+  nav.scrolled {
+    background: rgba(13,13,13,0.92);
+    backdrop-filter: blur(20px);
+    padding: 1.2rem 4rem;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+
+  .nav-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    color: var(--text);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+  .nav-logo em { font-style: italic; color: var(--gold); }
+
+  .nav-links {
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+    align-items: center;
+  }
+  .nav-links a {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.3s;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--gold);
+    transition: width 0.4s var(--ease-out);
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-cta {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--dark) !important;
+    background: var(--gold);
+    padding: 0.7rem 1.8rem;
+    border-radius: 0;
+    transition: background 0.3s, transform 0.3s !important;
+  }
+  .nav-cta::after { display: none !important; }
+  .nav-cta:hover { background: var(--gold-light) !important; transform: translateY(-2px); }
+
+  /* ============================
+     HERO CAROUSEL
+  ============================ */
+  #hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.4s var(--transition);
+  }
+  .slide.active { opacity: 1; }
+
+  .slide-bg {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform: scale(1.08);
+    transition: transform 8s ease;
+  }
+  .slide.active .slide-bg { transform: scale(1); }
+
+  .slide-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(0,0,0,0.75) 0%,
+      rgba(0,0,0,0.3) 50%,
+      rgba(0,0,0,0.15) 100%
+    );
+  }
+
+  .slide-content {
+    position: absolute;
+    bottom: 14%;
+    left: 8%;
+    max-width: 680px;
+  }
+
+  .slide-tag {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 0.4rem 1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s var(--ease-out) 0.2s;
+  }
+  .slide.active .slide-tag {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .slide-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 300;
+    line-height: 1.05;
+    color: var(--white);
+    margin-bottom: 1.2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s var(--ease-out) 0.35s;
+  }
+  .slide.active .slide-title { opacity: 1; transform: translateY(0); }
+
+  .slide-info {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s var(--ease-out) 0.5s;
+  }
+  .slide.active .slide-info { opacity: 1; transform: translateY(0); }
+
+  .slide-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+  .slide-details {
+    display: flex;
+    gap: 1.5rem;
+    border-left: 1px solid var(--text-dim);
+    padding-left: 2rem;
+  }
+  .slide-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+  .slide-detail strong {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 500;
+  }
+  .slide-detail span {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .slide-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 1rem 2rem;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s var(--ease-out) 0.65s, border-color 0.3s;
+  }
+  .slide.active .slide-btn { opacity: 1; transform: translateY(0); }
+  .slide-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--transition);
+  }
+  .slide-btn:hover { border-color: var(--gold); color: var(--dark); }
+  .slide-btn:hover::before { transform: scaleX(1); }
+  .slide-btn span { position: relative; z-index: 1; }
+  .slide-btn svg { position: relative; z-index: 1; transition: transform 0.3s; }
+  .slide-btn:hover svg { transform: translateX(6px); }
+
+  /* Carousel Controls */
+  .carousel-controls {
+    position: absolute;
+    bottom: 4%;
+    right: 8%;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    z-index: 10;
+  }
+
+  .carousel-btn {
+    width: 44px; height: 44px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: transparent;
+    color: var(--white);
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+  }
+  .carousel-btn:hover {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  .carousel-dots {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+  }
+  .dot {
+    width: 24px; height: 2px;
+    background: rgba(255,255,255,0.3);
+    cursor: none;
+    transition: all 0.4s;
+  }
+  .dot.active {
+    width: 48px;
+    background: var(--gold);
+  }
+
+  /* Scroll indicator */
+  .scroll-hint {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    z-index: 10;
+  }
+  .scroll-hint span {
+    font-size: 0.55rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  .scroll-line {
+    width: 1px;
+    height: 50px;
+    background: linear-gradient(to bottom, var(--gold), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* ============================
+     STATS BAR
+  ============================ */
+  .stats-bar {
+    background: var(--dark-3);
+    border-top: 1px solid rgba(201,168,76,0.15);
+    border-bottom: 1px solid rgba(201,168,76,0.15);
+    padding: 2.5rem 8%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+  }
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 2rem;
+    border-right: 1px solid rgba(201,168,76,0.12);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s, transform 0.6s var(--ease-out);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item.visible { opacity: 1; transform: translateY(0); }
+  .stat-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.8rem;
+    font-weight: 300;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ============================
+     SECTION HEADER
+  ============================ */
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .section-eyebrow {
+    display: inline-block;
+    font-size: 0.6rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--text);
+  }
+  .section-title em { font-style: italic; color: var(--gold-light); }
+  .section-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .divider-line {
+    width: 60px; height: 1px;
+    background: var(--gold-dim);
+  }
+  .divider-diamond {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  /* ============================
+     PROPERTIES SECTION
+  ============================ */
+  #properties {
+    padding: 8rem 8%;
+    background: var(--dark-2);
+  }
+
+  /* Filters */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: transparent;
+    border: 1px solid var(--text-dim);
+    padding: 0.6rem 1.5rem;
+    cursor: none;
+    transition: all 0.3s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    color: var(--dark);
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  /* Cards Grid */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .property-card {
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+  }
+  .property-card.visible { opacity: 1; transform: translateY(0); }
+
+  .card-img-wrap {
+    position: relative;
+    overflow: hidden;
+    height: 320px;
+  }
+  .card-img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.9s var(--transition);
+  }
+  .property-card:hover .card-img { transform: scale(1.08); }
+
+  .card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+    transition: opacity 0.4s;
+  }
+
+  .card-badge {
+    position: absolute;
+    top: 1.2rem;
+    left: 1.2rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.8rem;
+    z-index: 2;
+  }
+  .badge-new { background: var(--gold); color: var(--dark); }
+  .badge-exclusive { background: var(--dark-3); color: var(--gold); border: 1px solid var(--gold); }
+  .badge-sold { background: #C94C4C; color: var(--white); }
+
+  .card-favorite {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    width: 36px; height: 36px;
+    background: rgba(13,13,13,0.7);
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: none;
+    z-index: 2;
+    transition: all 0.3s;
+  }
+  .card-favorite:hover { border-color: var(--gold); }
+  .card-favorite.liked svg { fill: #C94C4C; stroke: #C94C4C; }
+
+  .card-img-overlay-info {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    padding: 1.5rem;
+    z-index: 2;
+  }
+
+  .card-body {
+    background: var(--dark-3);
+    padding: 1.6rem;
+    border-top: 1px solid rgba(201,168,76,0.08);
+    position: relative;
+  }
+
+  .card-location {
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.6rem;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    transition: color 0.3s;
+  }
+  .property-card:hover .card-title { color: var(--gold-light); }
+
+  .card-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+  }
+  .card-price {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--gold);
+  }
+  .card-price-unit {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+
+  .card-features {
+    display: flex;
+    gap: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(201,168,76,0.08);
+  }
+  .card-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .card-feature svg { color: var(--gold); flex-shrink: 0; }
+
+  .card-hover-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(201,168,76,0.03);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .property-card:hover .card-hover-overlay { opacity: 1; }
+
+  /* ============================
+     VIEW MORE
+  ============================ */
+  .view-more-wrap {
+    text-align: center;
+    margin-top: 4rem;
+  }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid rgba(201,168,76,0.4);
+    padding: 1.1rem 2.8rem;
+    text-decoration: none;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    transition: color 0.4s;
+  }
+  .btn-outline::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gold);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--transition);
+  }
+  .btn-outline:hover { color: var(--dark); }
+  .btn-outline:hover::before { transform: scaleX(1); }
+  .btn-outline span, .btn-outline svg { position: relative; }
+
+  /* ============================
+     SERVICES SECTION
+  ============================ */
+  #services {
+    padding: 8rem 8%;
+    background: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+  #services::before {
+    content: 'SERVICES';
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18vw;
+    font-weight: 300;
+    color: rgba(201,168,76,0.025);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.1em;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 4rem;
+  }
+  .service-card {
+    background: var(--dark-3);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out);
+  }
+  .service-card.visible { opacity: 1; transform: translateY(0); }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height 0.5s var(--ease-out);
+  }
+  .service-card:hover::before { height: 100%; }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(201,168,76,0.03) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .service-card:hover::after { opacity: 1; }
+
+  .service-icon {
+    width: 56px; height: 56px;
+    border: 1px solid rgba(201,168,76,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    color: var(--gold);
+    transition: all 0.3s;
+    position: relative;
+    z-index: 1;
+  }
+  .service-card:hover .service-icon {
+    background: var(--gold);
+    color: var(--dark);
+    border-color: var(--gold);
+  }
+  .service-num {
+    position: absolute;
+    top: 2rem; right: 2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    font-weight: 300;
+    color: rgba(201,168,76,0.06);
+    line-height: 1;
+  }
+  .service-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 1rem;
+    position: relative; z-index: 1;
+  }
+  .service-desc {
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    position: relative; z-index: 1;
+  }
+
+  /* ============================
+     FEATURED / SPOTLIGHT
+  ============================ */
+  #spotlight {
+    padding: 0;
+    background: var(--dark-2);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 70vh;
+  }
+  .spotlight-image {
+    position: relative;
+    overflow: hidden;
+  }
+  .spotlight-image img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s var(--transition);
+  }
+  #spotlight:hover .spotlight-image img { transform: scale(1.04); }
+  .spotlight-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent 60%, var(--dark-2) 100%);
+  }
+  .spotlight-content {
+    padding: 8rem 6rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+  .spotlight-tag {
+    font-size: 0.58rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+  .spotlight-tag::before {
+    content: '';
+    display: block;
+    width: 24px; height: 1px;
+    background: var(--gold);
+  }
+  .spotlight-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.5rem, 3.5vw, 3.8rem);
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .spotlight-title em { font-style: italic; display: block; color: var(--gold-light); }
+  .spotlight-desc {
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+  .spotlight-specs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: var(--dark-3);
+    border: 1px solid rgba(201,168,76,0.08);
+  }
+  .spec-item { display: flex; flex-direction: column; gap: 0.3rem; }
+  .spec-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.5rem;
+    color: var(--gold);
+  }
+  .spec-label {
+    font-size: 0.58rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ============================
+     TESTIMONIALS
+  ============================ */
+  #testimonials {
+    padding: 8rem 8%;
+    background: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 4rem;
+  }
+  .testimonial-card {
+    background: var(--dark-3);
+    border: 1px solid rgba(201,168,76,0.06);
+    padding: 2.5rem;
+    position: relative;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s var(--ease-out), transform 0.6s var(--ease-out), border-color 0.3s;
+  }
+  .testimonial-card.visible { opacity: 1; transform: translateY(0); }
+  .testimonial-card:hover { border-color: rgba(201,168,76,0.25); }
+  .quote-mark {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 5rem;
+    line-height: 0.6;
+    color: var(--gold);
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+    display: block;
+  }
+  .testimonial-text {
+    font-size: 0.82rem;
+    line-height: 1.85;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-style: italic;
+  }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-top: 1px solid rgba(201,168,76,0.1);
+    padding-top: 1.5rem;
+  }
+  .author-avatar {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(201,168,76,0.3);
+    background: var(--dark-4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.2rem;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .author-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+  .author-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 0.2rem;
+  }
+  .stars {
+    display: flex;
+    gap: 0.2rem;
+    margin-left: auto;
+    color: var(--gold);
+  }
+
+  /* ============================
+     CONTACT / CTA SECTION
+  ============================ */
+  #contact {
+    padding: 8rem 8%;
+    background: var(--dark-2);
+  }
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8rem;
+    align-items: start;
+  }
+  .contact-info {}
+  .contact-tagline {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .contact-tagline em { font-style: italic; color: var(--gold-light); }
+  .contact-desc {
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--text-muted);
+    margin-bottom: 3rem;
+  }
+  .contact-details { display: flex; flex-direction: column; gap: 1.5rem; }
+  .contact-detail-item {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .contact-detail-item .icon {
+    width: 40px; height: 40px;
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+
+  .contact-form { display: flex; flex-direction: column; gap: 1.2rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  .form-input, .form-select, .form-textarea {
+    background: var(--dark-3);
+    border: 1px solid rgba(201,168,76,0.1);
+    color: var(--text);
+    padding: 0.9rem 1.2rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.78rem;
+    outline: none;
+    transition: border-color 0.3s;
+    resize: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: rgba(201,168,76,0.5);
+  }
+  .form-input::placeholder, .form-textarea::placeholder {
+    color: var(--text-dim);
+  }
+  .form-select { cursor: none; }
+  .form-select option { background: var(--dark-3); }
+  .form-textarea { height: 120px; }
+  .submit-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: var(--gold);
+    color: var(--dark);
+    border: none;
+    padding: 1.1rem 2.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, transform 0.3s;
+    align-self: flex-start;
+  }
+  .submit-btn:hover { background: var(--gold-light); transform: translateY(-2px); }
+
+  /* ============================
+     FOOTER
+  ============================ */
+  footer {
+    background: var(--dark);
+    border-top: 1px solid rgba(201,168,76,0.1);
+    padding: 5rem 8% 2rem;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 4rem;
+    margin-bottom: 4rem;
+  }
+  .footer-brand {}
+  .footer-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.8rem;
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: var(--text);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+  }
+  .footer-logo em { font-style: italic; color: var(--gold); }
+  .footer-tagline {
+    font-size: 0.75rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+    max-width: 280px;
+    margin-bottom: 2rem;
+  }
+  .social-links { display: flex; gap: 0.8rem; }
+  .social-link {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(201,168,76,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.3s;
+  }
+  .social-link:hover { border-color: var(--gold); color: var(--gold); }
+  .footer-col-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .footer-links a {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--text); }
+  .footer-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(201,168,76,0.06);
+  }
+  .footer-copy {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+  }
+  .footer-legal {
+    display: flex;
+    gap: 2rem;
+  }
+  .footer-legal a {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-legal a:hover { color: var(--gold); }
+
+  /* ============================
+     FLOATING ELEMENTS
+  ============================ */
+  .gold-particle {
+    position: fixed;
+    width: 2px; height: 2px;
+    background: var(--gold);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9997;
+    animation: particleFade 1.5s ease-out forwards;
+  }
+  @keyframes particleFade {
+    0% { opacity: 0.8; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0); }
+  }
+
+  /* ============================
+     NOTIFICATION TOAST
+  ============================ */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--dark-3);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-left: 3px solid var(--gold);
+    padding: 1.2rem 1.8rem;
+    z-index: 9995;
+    transform: translateX(120%);
+    transition: transform 0.5s var(--ease-out);
+    max-width: 320px;
+  }
+  .toast.show { transform: translateX(0); }
+  .toast-title { font-size: 0.75rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+  .toast-msg { font-size: 0.7rem; color: var(--text-muted); line-height: 1.5; }
+
+  /* ============================
+     RESPONSIVE
+  ============================ */
+  @media (max-width: 1024px) {
+    nav { padding: 1.5rem 2rem; }
+    nav.scrolled { padding: 1rem 2rem; }
+    .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    .services-grid { grid-template-columns: repeat(2, 1fr); }
+    .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 3rem; }
+    #spotlight { grid-template-columns: 1fr; }
+    .spotlight-image { min-height: 50vh; }
+    .spotlight-image::after { background: linear-gradient(to top, var(--dark-2) 20%, transparent 100%); }
+    .contact-grid { grid-template-columns: 1fr; gap: 4rem; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+    .stat-item:nth-child(2) { border-right: none; }
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .cards-grid { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr; }
+    .testimonials-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .slide-content { left: 5%; right: 5%; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-logo">
+    <span>L</span><span>U</span><span>X</span><span>E</span>
+  </div>
+  <div class="loader-line"></div>
+  <div class="loader-sub">Immobilier d'Exception</div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast" id="toast">
+  <div class="toast-title">✦ Nouveau bien disponible</div>
+  <div class="toast-msg">Villa contemporaine, Lac de Tunis — 2 800 000 TND</div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">Luxe<em>.</em>Immo</a>
+  <ul class="nav-links">
+    <li><a href="#hero">Accueil</a></li>
+    <li><a href="#properties">Propriétés</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#spotlight">Coup de Cœur</a></li>
+    <li><a href="#testimonials">Avis</a></li>
+    <li><a href="#contact" class="nav-cta">Nous Contacter</a></li>
+  </ul>
+</nav>
+
+<!-- HERO CAROUSEL -->
+<section id="hero">
+  <!-- Slide 1 -->
+  <div class="slide active" data-index="0">
+    <img class="slide-bg" src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=1800&q=80" alt="Villa de luxe" />
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <span class="slide-tag">✦ Exclusivité — Carthage Heights</span>
+      <h1 class="slide-title">Villa Contemporaine<br>Vue Panoramique</h1>
+      <div class="slide-info">
+        <div class="slide-price">4 500 000 TND</div>
+        <div class="slide-details">
+          <div class="slide-detail"><strong>680 m²</strong><span>Surface</span></div>
+          <div class="slide-detail"><strong>6</strong><span>Chambres</span></div>
+          <div class="slide-detail"><strong>Piscine</strong><span>Privée</span></div>
+        </div>
+      </div>
+      <a href="#properties" class="slide-btn">
+        <span>Découvrir le bien</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="slide" data-index="1">
+    <img class="slide-bg" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1800&q=80" alt="Appartement de prestige" />
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <span class="slide-tag">✦ Nouveau — Les Berges du Lac</span>
+      <h1 class="slide-title">Penthouse Prestige<br>Dernière Acquisition</h1>
+      <div class="slide-info">
+        <div class="slide-price">1 850 000 TND</div>
+        <div class="slide-details">
+          <div class="slide-detail"><strong>320 m²</strong><span>Surface</span></div>
+          <div class="slide-detail"><strong>4</strong><span>Chambres</span></div>
+          <div class="slide-detail"><strong>Terrasse</strong><span>360°</span></div>
+        </div>
+      </div>
+      <a href="#properties" class="slide-btn">
+        <span>Découvrir le bien</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="slide" data-index="2">
+    <img class="slide-bg" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1800&q=80" alt="Maison de standing" />
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <span class="slide-tag">✦ Coup de Cœur — La Marsa</span>
+      <h1 class="slide-title">Demeure d'Architecte<br>Bord de Mer</h1>
+      <div class="slide-info">
+        <div class="slide-price">3 200 000 TND</div>
+        <div class="slide-details">
+          <div class="slide-detail"><strong>510 m²</strong><span>Surface</span></div>
+          <div class="slide-detail"><strong>5</strong><span>Chambres</span></div>
+          <div class="slide-detail"><strong>Jardin</strong><span>1 200 m²</span></div>
+        </div>
+      </div>
+      <a href="#properties" class="slide-btn">
+        <span>Découvrir le bien</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Slide 4 -->
+  <div class="slide" data-index="3">
+    <img class="slide-bg" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1800&q=80" alt="Résidence privée" />
+    <div class="slide-overlay"></div>
+    <div class="slide-content">
+      <span class="slide-tag">✦ Investissement — Gammarth</span>
+      <h1 class="slide-title">Résidence Privée<br>Rendement Garanti</h1>
+      <div class="slide-info">
+        <div class="slide-price">2 100 000 TND</div>
+        <div class="slide-details">
+          <div class="slide-detail"><strong>420 m²</strong><span>Surface</span></div>
+          <div class="slide-detail"><strong>5</strong><span>Chambres</span></div>
+          <div class="slide-detail"><strong>8%</strong><span>Rendement</span></div>
+        </div>
+      </div>
+      <a href="#properties" class="slide-btn">
+        <span>Découvrir le bien</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="carousel-controls">
+    <button class="carousel-btn" id="prevBtn" aria-label="Précédent">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="carousel-dots" id="dots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <button class="carousel-btn" id="nextBtn" aria-label="Suivant">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Défiler</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item" data-anim>
+    <div class="stat-num" data-count="850">0</div>
+    <div class="stat-label">Propriétés Vendues</div>
+  </div>
+  <div class="stat-item" data-anim style="transition-delay:.1s">
+    <div class="stat-num" data-count="1200">0</div>
+    <div class="stat-label">Clients Satisfaits</div>
+  </div>
+  <div class="stat-item" data-anim style="transition-delay:.2s">
+    <div class="stat-num" data-count="15">0</div>
+    <div class="stat-label">Années d'Expérience</div>
+  </div>
+  <div class="stat-item" data-anim style="transition-delay:.3s">
+    <div class="stat-num" data-count="98">0</div>
+    <div class="stat-label">% Taux de Satisfaction</div>
+  </div>
+</div>
+
+<!-- PROPERTIES -->
+<section id="properties">
+  <div class="section-header">
+    <span class="section-eyebrow">✦ Notre Portfolio</span>
+    <h2 class="section-title">Propriétés d'<em>Exception</em></h2>
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">Tous les biens</button>
+    <button class="filter-btn" data-filter="villa">Villas</button>
+    <button class="filter-btn" data-filter="appartement">Appartements</button>
+    <button class="filter-btn" data-filter="penthouse">Penthouses</button>
+    <button class="filter-btn" data-filter="terrain">Terrains</button>
+  </div>
+
+  <div class="cards-grid" id="cardsGrid">
+
+    <!-- Card 1 -->
+    <div class="property-card" data-type="villa" data-anim>
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80" alt="Villa Carthage" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-exclusive">Exclusivité</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Carthage, Tunis
+        </div>
+        <h3 class="card-title">Villa Contemporaine avec Piscine & Vue Mer</h3>
+        <div class="card-price-row">
+          <div class="card-price">4 500 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            6 ch.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4z"/></svg>
+            4 sdb.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            680 m²
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="property-card" data-type="penthouse" data-anim style="transition-delay:.1s">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" alt="Penthouse Lac" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-new">Nouveau</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Les Berges du Lac II
+        </div>
+        <h3 class="card-title">Penthouse Prestige — Terrasse 360°</h3>
+        <div class="card-price-row">
+          <div class="card-price">1 850 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            4 ch.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4z"/></svg>
+            3 sdb.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            320 m²
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="property-card" data-type="villa" data-anim style="transition-delay:.2s">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80" alt="Demeure La Marsa" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-exclusive">Coup de Cœur</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          La Marsa, Tunis Nord
+        </div>
+        <h3 class="card-title">Demeure d'Architecte — Bord de Mer</h3>
+        <div class="card-price-row">
+          <div class="card-price">3 200 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            5 ch.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4z"/></svg>
+            3 sdb.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            510 m²
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="property-card" data-type="appartement" data-anim style="transition-delay:.1s">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80" alt="Appartement standing" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-new">Nouveau</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Cité des Sciences, Tunis
+        </div>
+        <h3 class="card-title">Appartement Standing — Vue Dégagée</h3>
+        <div class="card-price-row">
+          <div class="card-price">680 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            3 ch.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4z"/></svg>
+            2 sdb.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            145 m²
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="property-card" data-type="villa" data-anim style="transition-delay:.2s">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80" alt="Villa Gammarth" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-exclusive">Investissement</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Gammarth, Tunis Nord
+        </div>
+        <h3 class="card-title">Résidence Privée — Rendement 8%</h3>
+        <div class="card-price-row">
+          <div class="card-price">2 100 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            5 ch.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12h2a2 2 0 0 1 2 2v3a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4z"/></svg>
+            3 sdb.
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            420 m²
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="property-card" data-type="terrain" data-anim style="transition-delay:.3s">
+      <div class="card-img-wrap">
+        <img class="card-img" src="https://images.unsplash.com/photo-1628744448840-55bdb2497bd4?w=800&q=80" alt="Terrain constructible" />
+        <div class="card-overlay"></div>
+        <span class="card-badge badge-new">Opportunité</span>
+        <button class="card-favorite" onclick="toggleFav(this)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="card-location">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Sidi Bou Saïd
+        </div>
+        <h3 class="card-title">Terrain Constructible — Vue Panoramique</h3>
+        <div class="card-price-row">
+          <div class="card-price">950 000 <span class="card-price-unit">TND</span></div>
+        </div>
+        <div class="card-features">
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+            1 800 m²
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 20h20M4 20V10l8-8 8 8v10"/></svg>
+            COS 0.5
+          </div>
+          <div class="card-feature">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+            R+3 autorisé
+          </div>
+        </div>
+        <div class="card-hover-overlay"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="view-more-wrap">
+    <a href="#" class="btn-outline">
+      <span>Voir tous nos biens</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="section-header">
+    <span class="section-eyebrow">✦ Notre Expertise</span>
+    <h2 class="section-title">Des Services <em>Sur-Mesure</em></h2>
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card" data-anim>
+      <div class="service-num">01</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
+      <h3 class="service-title">Vente & Acquisition</h3>
+      <p class="service-desc">Nous vous accompagnons dans chaque étape de votre projet immobilier, de la recherche jusqu'à la signature. Notre réseau exclusif vous donne accès aux meilleures opportunités du marché.</p>
+    </div>
+    <div class="service-card" data-anim style="transition-delay:.1s">
+      <div class="service-num">02</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+      <h3 class="service-title">Conseil & Estimation</h3>
+      <p class="service-desc">Notre équipe d'experts réalise des estimations précises basées sur les données du marché local. Un conseil stratégique pour maximiser la valeur de votre patrimoine immobilier.</p>
+    </div>
+    <div class="service-card" data-anim style="transition-delay:.2s">
+      <div class="service-num">03</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <h3 class="service-title">Gestion Locative</h3>
+      <p class="service-desc">Confiez-nous la gestion de votre bien immobilier. Nous prenons en charge la recherche de locataires, la gestion des loyers et l'entretien de votre patrimoine.</p>
+    </div>
+    <div class="service-card" data-anim style="transition-delay:.1s">
+      <div class="service-num">04</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <h3 class="service-title">Financement & Montage</h3>
+      <p class="service-desc">Nous vous mettons en relation avec nos partenaires bancaires pour trouver les meilleures solutions de financement adaptées à votre profil et à votre projet.</p>
+    </div>
+    <div class="service-card" data-anim style="transition-delay:.2s">
+      <div class="service-num">05</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <h3 class="service-title">Visite Virtuelle 3D</h3>
+      <p class="service-desc">Visitez nos propriétés depuis chez vous grâce à notre technologie de visite virtuelle 360°. Une expérience immersive pour une décision éclairée avant même de vous déplacer.</p>
+    </div>
+    <div class="service-card" data-anim style="transition-delay:.3s">
+      <div class="service-num">06</div>
+      <div class="service-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <h3 class="service-title">Accompagnement Juridique</h3>
+      <p class="service-desc">Nos juristes partenaires vous accompagnent dans tous les aspects légaux de votre transaction : promesse de vente, acte authentique, fiscalité immobilière.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SPOTLIGHT / COUP DE COEUR -->
+<section id="spotlight">
+  <div class="spotlight-image">
+    <img src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1200&q=80" alt="Coup de coeur" />
+  </div>
+  <div class="spotlight-content">
+    <div class="spotlight-tag">Coup de Cœur du Mois</div>
+    <h2 class="spotlight-title">
+      Villa Carthage Heights
+      <em>L'Art de Vivre Tunisien</em>
+    </h2>
+    <p class="spotlight-desc">
+      Nichée sur les hauteurs de Carthage, cette villa d'exception offre une vue imprenable sur la mer Méditerranée. Conçue par un architecte de renom, elle allie matériaux nobles et design contemporain dans un cadre naturel préservé.
+    </p>
+    <div class="spotlight-specs">
+      <div class="spec-item">
+        <div class="spec-val">680 m²</div>
+        <div class="spec-label">Surface habitable</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">1 500 m²</div>
+        <div class="spec-label">Terrain</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">6</div>
+        <div class="spec-label">Chambres</div>
+      </div>
+      <div class="spec-item">
+        <div class="spec-val">4 500 000</div>
+        <div class="spec-label">Prix (TND)</div>
+      </div>
+    </div>
+    <a href="#contact" class="btn-outline">
+      <span>Prendre rendez-vous</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="section-header">
+    <span class="section-eyebrow">✦ Témoignages</span>
+    <h2 class="section-title">Ce Que Disent Nos <em>Clients</em></h2>
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+  <div class="testimonials-grid">
+    <div class="testimonial-card" data-anim>
+      <span class="quote-mark">"</span>
+      <p class="testimonial-text">Une équipe d'une professionnalisme remarquable. Ils ont trouvé notre villa de rêve en seulement 3 semaines, correspondant parfaitement à nos critères les plus exigeants. Une expérience vraiment unique.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">KM</div>
+        <div>
+          <div class="author-name">Karim Mellouli</div>
+          <div class="author-title">Directeur Général — Sfax</div>
+        </div>
+        <div class="stars">
+          ★★★★★
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-card" data-anim style="transition-delay:.1s">
+      <span class="quote-mark">"</span>
+      <p class="testimonial-text">Luxe Immo m'a accompagné dans mon premier investissement immobilier avec une expertise rare. Leur connaissance du marché tunisien et leur réseau ont fait toute la différence. Je recommande vivement.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">SB</div>
+        <div>
+          <div class="author-name">Sonia Belhaj</div>
+          <div class="author-title">Entrepreneur — Tunis</div>
+        </div>
+        <div class="stars">★★★★★</div>
+      </div>
+    </div>
+    <div class="testimonial-card" data-anim style="transition-delay:.2s">
+      <span class="quote-mark">"</span>
+      <p class="testimonial-text">De la recherche jusqu'à la signature chez le notaire, tout s'est déroulé avec fluidité et transparence totale. Une agence qui mérite vraiment sa réputation dans le secteur du luxe.</p>
+      <div class="testimonial-author">
+        <div class="author-avatar">AT</div>
+        <div>
+          <div class="author-name">Ahmed Tlili</div>
+          <div class="author-title">Architecte — La Marsa</div>
+        </div>
+        <div class="stars">★★★★★</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-header">
+    <span class="section-eyebrow">✦ Contact</span>
+    <h2 class="section-title">Parlons de Votre <em>Projet</em></h2>
+    <div class="section-divider">
+      <div class="divider-line"></div>
+      <div class="divider-diamond"></div>
+      <div class="divider-line"></div>
+    </div>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-info">
+      <h3 class="contact-tagline">Votre bien d'exception <em>n'attend que vous</em></h3>
+      <p class="contact-desc">Notre équipe de conseillers est à votre disposition pour répondre à toutes vos questions et vous accompagner dans votre projet immobilier, quelle que soit sa nature.</p>
+      <div class="contact-details">
+        <div class="contact-detail-item">
+          <div class="icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <span>Les Berges du Lac II, Immeuble Prestige, 4ème étage — Tunis</span>
+        </div>
+        <div class="contact-detail-item">
+          <div class="icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <span>+216 70 000 000</span>
+        </div>
+        <div class="contact-detail-item">
+          <div class="icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <span>contact@luximmo.tn</span>
+        </div>
+        <div class="contact-detail-item">
+          <div class="icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <span>Lun – Sam : 9h00 à 18h00</span>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form" id="contactForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Prénom</label>
+          <input class="form-input" type="text" placeholder="Votre prénom" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nom</label>
+          <input class="form-input" type="text" placeholder="Votre nom" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" placeholder="votre@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input class="form-input" type="tel" placeholder="+216 00 000 000" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type de projet</label>
+        <select class="form-select form-input">
+          <option value="">Sélectionnez votre projet</option>
+          <option>Achat résidence principale</option>
+          <option>Investissement locatif</option>
+          <option>Vente d'un bien</option>
+          <option>Estimation gratuite</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" placeholder="Décrivez votre projet immobilier..."></textarea>
+      </div>
+      <button class="submit-btn" onclick="handleSubmit()">
+        <span>Envoyer ma demande</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <div class="footer-logo">Luxe<em>.</em>Immo</div>
+      <p class="footer-tagline">L'agence immobilière de référence en Tunisie pour les propriétés d'exception. 15 ans d'expertise au service de vos projets les plus ambitieux.</p>
+      <div class="social-links">
+        <a class="social-link" href="#" aria-label="Facebook">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+        </a>
+        <a class="social-link" href="#" aria-label="Instagram">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a class="social-link" href="#" aria-label="LinkedIn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+        </a>
+        <a class="social-link" href="#" aria-label="YouTube">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#0D0D0D"/></svg>
+        </a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Navigation</div>
+      <ul class="footer-links">
+        <li><a href="#hero">Accueil</a></li>
+        <li><a href="#properties">Nos Propriétés</a></li>
+        <li><a href="#services">Nos Services</a></li>
+        <li><a href="#spotlight">Coup de Cœur</a></li>
+        <li><a href="#testimonials">Avis Clients</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Propriétés</div>
+      <ul class="footer-links">
+        <li><a href="#">Villas de Luxe</a></li>
+        <li><a href="#">Appartements</a></li>
+        <li><a href="#">Penthouses</a></li>
+        <li><a href="#">Terrains</a></li>
+        <li><a href="#">Biens en Location</a></li>
+        <li><a href="#">Nouvelles Offres</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Zones</div>
+      <ul class="footer-links">
+        <li><a href="#">Carthage</a></li>
+        <li><a href="#">La Marsa</a></li>
+        <li><a href="#">Sidi Bou Saïd</a></li>
+        <li><a href="#">Gammarth</a></li>
+        <li><a href="#">Les Berges du Lac</a></li>
+        <li><a href="#">Hammamet</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Luxe.Immo — Tous droits réservés</div>
+    <div class="footer-legal">
+      <a href="#">Mentions Légales</a>
+      <a href="#">Politique de Confidentialité</a>
+      <a href="#">CGV</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============================
+  // CURSOR
+  // ============================
+  const cursor = document.getElementById('cursor');
+  const cursorRing = document.getElementById('cursorRing');
+  let mouseX = 0, mouseY = 0;
+  let ringX = 0, ringY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+    spawnParticle(e.clientX, e.clientY);
+  });
+
+  function animateCursor() {
+    ringX += (mouseX - ringX) * 0.15;
+    ringY += (mouseY - ringY) * 0.15;
+    cursorRing.style.left = ringX + 'px';
+    cursorRing.style.top = ringY + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // ============================
+  // PARTICLES
+  // ============================
+  let lastParticleTime = 0;
+  function spawnParticle(x, y) {
+    const now = Date.now();
+    if (now - lastParticleTime < 80) return;
+    lastParticleTime = now;
+    const p = document.createElement('div');
+    p.className = 'gold-particle';
+    const dx = (Math.random() - 0.5) * 40 + 'px';
+    const dy = (Math.random() - 0.5) * 40 + 'px';
+    p.style.cssText = `left:${x}px;top:${y}px;--dx:${dx};--dy:${dy};`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1500);
+  }
+
+  // ============================
+  // LOADER
+  // ============================
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('loader').classList.add('hidden');
+      // Show toast after a delay
+      setTimeout(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 5000);
+      }, 2000);
+    }, 2200);
+  });
+
+  // ============================
+  // NAVBAR SCROLL
+  // ============================
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+  });
+
+  // ============================
+  // CAROUSEL
+  // ============================
+  const slides = document.querySelectorAll('.slide');
+  const dots = document.querySelectorAll('.dot');
+  let current = 0;
+  let autoTimer;
+
+  function goTo(index) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = (index + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function autoPlay() {
+    autoTimer = setInterval(() => goTo(current + 1), 6000);
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    clearInterval(autoTimer);
+    goTo(current + 1);
+    autoPlay();
+  });
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    clearInterval(autoTimer);
+    goTo(current - 1);
+    autoPlay();
+  });
+  dots.forEach((dot, i) => {
+    dot.addEventListener('click', () => {
+      clearInterval(autoTimer);
+      goTo(i);
+      autoPlay();
+    });
+  });
+  autoPlay();
+
+  // Touch swipe for carousel
+  let touchStartX = 0;
+  document.getElementById('hero').addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+  });
+  document.getElementById('hero').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      clearInterval(autoTimer);
+      goTo(dx < 0 ? current + 1 : current - 1);
+      autoPlay();
+    }
+  });
+
+  // ============================
+  // SCROLL ANIMATIONS
+  // ============================
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+  document.querySelectorAll('[data-anim]').forEach(el => observer.observe(el));
+
+  // ============================
+  // COUNTER ANIMATION
+  // ============================
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.counted) {
+        entry.target.dataset.counted = '1';
+        const items = entry.target.querySelectorAll('.stat-num');
+        items.forEach((el, i) => {
+          const target = parseInt(el.dataset.count);
+          let count = 0;
+          const step = target / 60;
+          const delay = i * 150;
+          setTimeout(() => {
+            const interval = setInterval(() => {
+              count = Math.min(count + step, target);
+              el.textContent = Math.floor(count).toLocaleString('fr-FR');
+              if (count >= target) clearInterval(interval);
+            }, 25);
+          }, delay);
+        });
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counterObserver.observe(document.querySelector('.stats-bar'));
+
+  // ============================
+  // FILTER
+  // ============================
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.property-card').forEach(card => {
+        const show = filter === 'all' || card.dataset.type === filter;
+        card.style.transition = 'all 0.5s cubic-bezier(0.16,1,0.3,1)';
+        if (show) {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0) scale(1)';
+          card.style.display = '';
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(20px) scale(0.97)';
+          setTimeout(() => {
+            if (btn.dataset.filter !== filter || !btn.classList.contains('active')) return;
+            card.style.display = 'none';
+          }, 400);
+        }
+      });
+    });
+  });
+
+  // ============================
+  // FAVORITES
+  // ============================
+  function toggleFav(btn) {
+    btn.classList.toggle('liked');
+  }
+
+  // ============================
+  // FORM SUBMIT
+  // ============================
+  function handleSubmit() {
+    const toast = document.getElementById('toast');
+    document.querySelector('.toast-title').textContent = '✓ Message envoyé !';
+    document.querySelector('.toast-msg').textContent = 'Nous vous répondrons dans les 24h. Merci pour votre confiance.';
+    toast.style.borderLeftColor = '#4CAF50';
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        document.querySelector('.toast-title').textContent = '✦ Nouveau bien disponible';
+        document.querySelector('.toast-msg').textContent = 'Villa contemporaine, Lac de Tunis — 2 800 000 TND';
+        toast.style.borderLeftColor = 'var(--gold)';
+      }, 600);
+    }, 4000);
+  }
+
+  // ============================
+  // PARALLAX ON SCROLL
+  // ============================
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    document.querySelectorAll('.slide.active .slide-bg').forEach(bg => {
+      bg.style.transform = `scale(1) translateY(${scrolled * 0.3}px)`;
+    });
+  });
+
+  // Smooth reveal on scroll for spotlight
+  const spotlightContent = document.querySelector('.spotlight-content');
+  if (spotlightContent) {
+    const spotObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.querySelectorAll('.spotlight-tag, .spotlight-title, .spotlight-desc, .spotlight-specs, .btn-outline').forEach((el, i) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(24px)';
+            el.style.transition = `opacity 0.7s ease ${i * 0.12}s, transform 0.7s cubic-bezier(0.16,1,0.3,1) ${i * 0.12}s`;
+            setTimeout(() => {
+              el.style.opacity = '1';
+              el.style.transform = 'translateY(0)';
+            }, 50);
+          });
+        }
+      });
+    }, { threshold: 0.2 });
+    spotObserver.observe(spotlightContent);
+  }
+</script>
+</body>
+</html>
